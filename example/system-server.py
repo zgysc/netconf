@@ -54,7 +54,7 @@ class SystemServer(object):
     def __init__(self, port, host_key, auth, debug):
         self.server = server.NetconfSSHServer(auth, self, port, host_key, debug)
 
-    def close():
+    def close(self):
         self.server.close()
 
     def nc_append_capabilities(self, capabilities):  # pylint: disable=W0613
@@ -110,6 +110,11 @@ class SystemServer(object):
         clockc.append(util.leaf_elm("sys:timezone-utc-offset", int(time.timezone / 100)))
 
         return util.filter_results(rpc, data, filter_or_none)
+    
+    def rpc_edit_config(self, session, rpc, *params):  # pylint: disable=W0613
+        """Passed the source element"""
+        data = util.elm("ok")
+        return util.filter_results(rpc, data, None)
 
     def rpc_system_restart(self, session, rpc, *params):
         raise error.AccessDeniedAppError(rpc)
@@ -124,7 +129,7 @@ def main(*margs):
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     parser.add_argument(
         "--password", default="admin", help='Use "env:" or "file:" prefix to specify source')
-    parser.add_argument('--port', type=int, default=8300, help='Netconf server port')
+    parser.add_argument('--port', type=int, default=830, help='Netconf server port')
     parser.add_argument("--username", default="admin", help='Netconf username')
     args = parser.parse_args(*margs)
 
